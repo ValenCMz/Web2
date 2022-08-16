@@ -1,0 +1,47 @@
+//Model pasaje
+public function get($idPasaje){
+    $query->$this->db->prepare("SELECT * FROM pasaje WHERE id=?");
+    $query->execute([$idPasaje]);
+    $pasaje = $query->fetch(PDO::FETCH_OBJ);
+    return $pasaje;
+}
+
+public function delete($idPasaje){
+    $query = $this->db->prepare("DELETE FROM pasaje WHERE id = ?");
+    $query->execute([$pasajeId]);
+}
+
+//Model vuelos
+
+public function get($idPasaje){
+    $query->$this->db->prepare("SELECT * FROM vuelo WHERE id=?");
+    $query->execute([$idPasaje]);
+    $vuelo = $query->fetch(PDO::FETCH_OBJ);
+    return $vuelo;
+}
+
+//Controller pasaje
+
+
+public function devolverPasaje($idPasaje){
+    if(!$this->authHelper->checkLogin()){
+        return $this->view->Error("No estas logueado");
+    }
+    else{//esta logueado 
+        $pasaje = $this->modelPasaje->get($idPasaje);
+        if(!isset($pasaje)){
+            return  $this->view->Error("No existe el pasaje");
+        }
+        else{//el pasaje existe
+            $idVuelo = $pasaje->id_vuelo;
+            $vuelo = $this->modelVuelo->get($idVuelo)
+            //supongo que nacional en booleano es 0 y internacional es 1
+            if($vuelo->internacional == 0){
+                $this->modelPasaje->deletePasaje($idPasaje);
+                $this->view->showExito("Se borro el pasaje");
+            }else{
+                $this->view->error("EL pasaje no se puede eliminar porque es internacional")
+            }
+        }
+    }
+}
